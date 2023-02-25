@@ -10,6 +10,7 @@ export default {
 	): Promise<Response> {
 		const logger = new WorkerLogger({
 			level: "DEBUG",
+			levelKey: "severity",
 			destinationFunction: async function(lines) {
 				console.log("I am sending lines", JSON.stringify(lines))
 			}
