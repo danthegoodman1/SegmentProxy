@@ -19,6 +19,11 @@ export default {
     const logger = new WorkerLogger({
       level: "DEBUG",
       levelKey: "severity",
+      withMeta: {
+        url: request.url,
+        headers: request.headers,
+        method: request.method
+      },
       destinationFunction: async function (lines) {
         const serviceAccount = JSON.parse(env.SERVICE_ACCT) as ServiceAccount
 
