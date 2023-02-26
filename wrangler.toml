@@ -1,3 +1,7 @@
 name = "segmentproxy"
 main = "src/index.ts"
 compatibility_date = "2023-02-25"
+
+[vars]
+CDN_SUBDOMAIN="segcdn"
+API_SUBDOMAIN="segapi"

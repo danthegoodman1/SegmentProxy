@@ -12,6 +12,7 @@
     "deploy": "wrangler publish"
   },
   "dependencies": {
-    "cfworkerslogger": "^0.0.4"
+    "cfworkerslogger": "^0.0.4",
+    "js-base64": "^3.7.5"
   }
 }
