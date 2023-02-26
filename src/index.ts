@@ -1,5 +1,5 @@
 import WorkerLogger from "cfworkerslogger"
-import Base64 from "js-base64"
+import {Base64} from "js-base64"
 import { SegmentCDNSettings } from "./types/segment"
 import { ServiceAccount } from "./types/serviceAccount"
 import { RetryableFetch } from "./utils"
