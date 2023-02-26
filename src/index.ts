@@ -116,7 +116,8 @@ export default {
                       ...line.meta
                     }
                   }
-                })
+                }),
+                dryRun: true
             }),
           }
         )
