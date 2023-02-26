@@ -98,15 +98,15 @@ export default {
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
-              logName: `projects/${serviceAccount.project_id}/logs/cloudflareloggingtest`,
+              logName: `projects/${serviceAccount.project_id}/logs/segmentproxyworker`,
               resource: {
                 type: "global", // https://cloud.google.com/logging/docs/api/v2/resource-list
-                labels: {
-                  resource_label_A: "this a resource label",
+                labels: { // can't put extra labels on global resource...
+                  // resource_label_A: "this a resource label",
                 },
               },
               labels: {
-                label_A: "a content",
+                worker: "segmentproxy",
               },
               entries: lines.map((line) => {
                   return {
@@ -117,7 +117,7 @@ export default {
                     }
                   }
                 }),
-                dryRun: true
+                // dryRun: true
             }),
           }
         )
@@ -130,6 +130,7 @@ export default {
     let newURL: URL
     switch (sub) {
       case env.CDN_SUBDOMAIN:
+        logger.debug("getting the cdn")
         newURL = new URL(request.url)
         newURL.hostname = "cdn.segment.com"
 				res = await fetch(newURL.toString(), request as any)
@@ -145,6 +146,7 @@ export default {
         })
         break
       case env.API_SUBDOMAIN:
+        logger.debug("getting the api")
 				newURL = new URL(request.url)
         newURL.hostname = "api.segment.io"
 				res = fetch(newURL.toString(), request as any)
