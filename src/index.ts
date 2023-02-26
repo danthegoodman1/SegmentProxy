@@ -131,7 +131,7 @@ export default {
       case env.CDN_SUBDOMAIN:
         newURL = new URL(request.url)
         newURL.hostname = "cdn.segment.com"
-				res = await RetryableFetch(newURL.toString(), request as any)
+				res = await fetch(newURL.toString(), request as any)
         const resBody = await res.json() as SegmentCDNSettings
         resBody.integrations["Segment.io"].apiHost = "api.segment.io/v1"
         const newBody = JSON.stringify(resBody)
@@ -145,7 +145,7 @@ export default {
       case env.API_SUBDOMAIN:
 				newURL = new URL(request.url)
         newURL.hostname = "api.segment.io"
-				res = RetryableFetch(newURL.toString(), request as any)
+				res = fetch(newURL.toString(), request as any)
         break
 
       default:
