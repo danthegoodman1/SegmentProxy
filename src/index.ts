@@ -133,13 +133,17 @@ export default {
         newURL = new URL(request.url)
         newURL.hostname = "cdn.segment.com"
 				res = await fetch(newURL.toString(), request as any)
-        const resBody = await res.json() as SegmentCDNSettings
-        resBody.integrations["Segment.io"].apiHost = "api.segment.io/v1"
+        const resText = await res.text()
+        console.log("restext:", resText)
+        const resBody = JSON.parse(resText) as SegmentCDNSettings
+        resBody.integrations["Segment.io"].apiHost = "segapi.cf.tangia.co/v1"
         const newBody = JSON.stringify(resBody)
+        console.log("newbody", newBody)
         res = new Response(newBody, {
           headers: {
             ...res.headers,
-            "content-length": newBody.length.toString()
+            "content-length": newBody.length.toString(),
+            "access-control-allow-origin": "*"
           }
         })
         break
@@ -156,7 +160,7 @@ export default {
         break
     }
 
-    ctx.waitUntil(logger.Drain())
+    // ctx.waitUntil(logger.Drain())
     return res
   },
 }
