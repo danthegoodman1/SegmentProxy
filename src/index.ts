@@ -131,40 +131,50 @@ export default {
     })
 
     let res: Response | Promise<Response>
-    const sub = new URL(request.url).hostname.split(".")[0]
-    let newURL: URL
-    switch (sub) {
-      case env.CDN_SUBDOMAIN:
-        logger.debug("getting the cdn")
-        newURL = new URL(request.url)
-        newURL.hostname = "cdn.segment.com"
-				res = await fetch(newURL.toString(), request as any)
-        const resBody = await res.json() as SegmentCDNSettings
-        resBody.integrations["Segment.io"].apiHost = "segapi.cf.tangia.co/v1"
-        const newBody = JSON.stringify(resBody)
-        res = new Response(newBody, {
-          headers: {
-            ...res.headers,
-            "content-length": newBody.length.toString(),
-            "access-control-allow-origin": "*"
-          }
-        })
-        break
-      case env.API_SUBDOMAIN:
-        logger.debug("getting the api")
-				newURL = new URL(request.url)
-        newURL.hostname = "api.segment.io"
-				res = fetch(newURL.toString(), request as any)
-        break
+    res = new Response("internal error", {
+      status: 500
+    })
+    try {
+      const sub = new URL(request.url).hostname.split(".")[0]
+      let newURL: URL
+      switch (sub) {
+        case env.CDN_SUBDOMAIN:
+          logger.debug("getting the cdn")
+          newURL = new URL(request.url)
+          newURL.hostname = "cdn.segment.com"
+  				res = await fetch(newURL.toString(), request as any)
+          const resBody = await res.json() as SegmentCDNSettings
+          resBody.integrations["Segment.io"].apiHost = "segapi.cf.tangia.co/v1"
+          const newBody = JSON.stringify(resBody)
+          res = new Response(newBody, {
+            headers: {
+              ...res.headers,
+              "content-length": newBody.length.toString(),
+              "access-control-allow-origin": "*"
+            }
+          })
+          break
+        case env.API_SUBDOMAIN:
+          logger.debug("getting the api")
+  				newURL = new URL(request.url)
+          newURL.hostname = "api.segment.io"
+  				res = fetch(newURL.toString(), request as any)
+          break
 
-      default:
-        res = new Response("subdomain not found", {
-          status: 404,
-        })
-        break
+        default:
+          res = new Response("subdomain not found", {
+            status: 404,
+          })
+          break
+      }
+    } catch (error) {
+      logger.error("error handling proxy", {
+        err: Object.fromEntries(Object.getOwnPropertyNames(error).map((prop) => [prop, (error as any)[prop]]))
+      })
+    } finally {
+      ctx.waitUntil(logger.Drain())
+      return res
     }
 
-    ctx.waitUntil(logger.Drain())
-    return res
   },
 }
