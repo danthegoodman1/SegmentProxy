@@ -148,9 +148,13 @@ export default {
           newURL = new URL(request.url)
           newURL.hostname = "cdn.segment.com"
   				res = await fetch(newURL.toString(), request as any)
-          const resBody = await res.json() as SegmentCDNSettings
-          resBody.integrations["Segment.io"].apiHost = "segapi.cf.tangia.co/v1"
-          const newBody = JSON.stringify(resBody)
+          const reqBody = await request.text()
+          logger.debug("got request body", {
+            bodyText: reqBody
+          })
+          const settings = JSON.parse(reqBody) as SegmentCDNSettings
+          settings.integrations["Segment.io"].apiHost = "segapi.cf.tangia.co/v1"
+          const newBody = JSON.stringify(settings)
           res = new Response(newBody, {
             headers: {
               ...res.headers,
