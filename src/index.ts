@@ -8,6 +8,7 @@ export interface Env {
   SERVICE_ACCT: string
   CDN_SUBDOMAIN: string
   API_SUBDOMAIN: string
+  PREFIX_SECRET: string
 }
 
 export default {
@@ -135,25 +136,37 @@ export default {
       },
     })
 
+    const reqURL = new URL(request.url)
+    if (!reqURL.pathname.startsWith("/"+env.PREFIX_SECRET)) {
+      logger.debug("request did not have prefix secret, ignoring", {
+        pathName: reqURL.pathname
+      })
+      return new Response("SCRAM!", {
+        status: 401
+      })
+    }
+
     let res: Response | Promise<Response>
     res = new Response("internal error", {
       status: 500
     })
     try {
-      const sub = new URL(request.url).hostname.split(".")[0]
+      const sub = reqURL.hostname.split(".")[0]
       let newURL: URL
+      newURL = new URL(request.url)
+      newURL.pathname = newURL.pathname.split("/"+env.PREFIX_SECRET)[1]
+      console.log("using new pathname", newURL.pathname)
       switch (sub) {
         case env.CDN_SUBDOMAIN:
           logger.debug("getting the cdn")
-          newURL = new URL(request.url)
           newURL.hostname = "cdn.segment.com"
   				res = await fetch(newURL.toString(), request as any)
-          const reqBody = await request.text()
+          const resBody = await res.text()
           logger.debug("got request body", {
-            bodyText: reqBody
+            bodyText: resBody
           })
-          const settings = JSON.parse(reqBody) as SegmentCDNSettings
-          settings.integrations["Segment.io"].apiHost = "segapi.cf.tangia.co/v1"
+          const settings = JSON.parse(resBody) as SegmentCDNSettings
+          settings.integrations["Segment.io"].apiHost = `segapi.cf.tangia.co/${env.PREFIX_SECRET}/v1`
           const newBody = JSON.stringify(settings)
           res = new Response(newBody, {
             headers: {
@@ -165,7 +178,6 @@ export default {
           break
         case env.API_SUBDOMAIN:
           logger.debug("getting the api")
-  				newURL = new URL(request.url)
           newURL.hostname = "api.segment.io"
   				res = fetch(newURL.toString(), request as any)
           break

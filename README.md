@@ -22,6 +22,19 @@ Configure the env vars
 
 `API_SUBDOMAIN` to the subdomain that will proxy to the segment api. Ex: `segapi`
 
+`PREFIX_SECRET` the first directory in the path that will be popped out in the worker before sendig to Segment. This is so that all the other requests that scanners and such do can be dropped with 404 status codes.
+
+Example config:
+
+```ts
+AnalyticsBrowser.load({
+  writeKey: import.meta.env.VITE_SEGMENT_WRITE_KEY,
+  cdnURL: 'https://your.domain.com/ttt',
+})
+```
+
+Where `ttt` is the `PREFIX_SECRET`
+
 **NOTE:** In this repo we also have code that will async log to Google Cloud Logging using the API directly with https://github.com/danthegoodman1/WorkersLogger. You can fork and change that code to log somewhere else.
 
 ## How it works
