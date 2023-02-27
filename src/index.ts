@@ -155,7 +155,6 @@ export default {
       let newURL: URL
       newURL = new URL(request.url)
       newURL.pathname = newURL.pathname.split("/"+env.PREFIX_SECRET)[1]
-      console.log("using new pathname", newURL.pathname)
       switch (sub) {
         case env.CDN_SUBDOMAIN:
           logger.debug("getting the cdn")
