@@ -21,7 +21,7 @@ export default {
       levelKey: "severity",
       withMeta: {
         url: request.url,
-        headers: request.headers,
+        headers: Object.fromEntries(request.headers.entries()),
         method: request.method
       },
       destinationFunction: async function (lines) {
