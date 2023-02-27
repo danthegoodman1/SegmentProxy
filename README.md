@@ -1,6 +1,6 @@
 # Cloudflare Worker Segment Proxy
 
-Use in production at [Tangia](www.tangia.co)
+Used in production at [Tangia](https://www.tangia.co).
 
 Segment allows you to proxy request completely through your own domain as seen here: https://segment.com/docs/connections/sources/catalog/libraries/website/javascript/custom-proxy
 
