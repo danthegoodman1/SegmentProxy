@@ -146,7 +146,7 @@ export default {
       })
     }
 
-    let res: Response | Promise<Response>
+    let res: Response
     res = new Response("internal error", {
       status: 500
     })
@@ -178,7 +178,7 @@ export default {
         case env.API_SUBDOMAIN:
           logger.debug("getting the api")
           newURL.hostname = "api.segment.io"
-  				res = fetch(newURL.toString(), request as any)
+  				res = await fetch(newURL.toString(), request as any)
           break
 
         default:
@@ -192,6 +192,7 @@ export default {
         err: Object.fromEntries(Object.getOwnPropertyNames(error).map((prop) => [prop, (error as any)[prop]]))
       })
     } finally {
+      logger.logHTTP(request, res)
       ctx.waitUntil(logger.Drain())
       return res
     }
