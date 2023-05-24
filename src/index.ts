@@ -154,6 +154,12 @@ export default {
       const sub = reqURL.hostname.split(".")[0]
       let newURL: URL
       newURL = new URL(request.url)
+      if (!newURL.pathname.includes("v1")) {
+        // Weird request, just respond
+        return new Response(null, {
+          status: 400
+        })
+      }
       if (!!env.PREFIX_SECRET) {
         newURL.pathname = newURL.pathname.split("/"+env.PREFIX_SECRET)[1]
       }
