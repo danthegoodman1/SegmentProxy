@@ -137,7 +137,7 @@ export default {
     })
 
     const reqURL = new URL(request.url)
-    if (!reqURL.pathname.startsWith("/"+env.PREFIX_SECRET)) {
+    if (!!env.PREFIX_SECRET && !reqURL.pathname.startsWith("/"+env.PREFIX_SECRET)) {
       logger.debug("request did not have prefix secret, ignoring", {
         pathName: reqURL.pathname
       })
@@ -154,7 +154,9 @@ export default {
       const sub = reqURL.hostname.split(".")[0]
       let newURL: URL
       newURL = new URL(request.url)
-      newURL.pathname = newURL.pathname.split("/"+env.PREFIX_SECRET)[1]
+      if (!!env.PREFIX_SECRET) {
+        newURL.pathname = newURL.pathname.split("/"+env.PREFIX_SECRET)[1]
+      }
       switch (sub) {
         case env.CDN_SUBDOMAIN:
           logger.debug("getting the cdn")
@@ -165,7 +167,7 @@ export default {
             bodyText: resBody
           })
           const settings = JSON.parse(resBody) as SegmentCDNSettings
-          settings.integrations["Segment.io"].apiHost = `segapi.cf.tangia.co/${env.PREFIX_SECRET}/v1`
+          settings.integrations["Segment.io"].apiHost = !!env.PREFIX_SECRET ? `segapi.cf.tangia.co/${env.PREFIX_SECRET}/v1` : `segapi.cf.tangia.co/v1`
           const newBody = JSON.stringify(settings)
           res = new Response(newBody, {
             headers: {
