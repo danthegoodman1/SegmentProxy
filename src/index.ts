@@ -172,17 +172,29 @@ export default {
           logger.debug("got request body", {
             bodyText: resBody
           })
-          const settings = JSON.parse(resBody) as SegmentCDNSettings
-          settings.integrations["Segment.io"].apiHost = !!env.PREFIX_SECRET ? `segapi.cf.tangia.co/${env.PREFIX_SECRET}/v1` : `segapi.cf.tangia.co/v1`
-          const newBody = JSON.stringify(settings)
-          res = new Response(newBody, {
-            headers: {
-              ...res.headers,
-              "content-length": newBody.length.toString(),
-              "access-control-allow-origin": "*"
-            }
-          })
-          break
+          try {
+            const settings = JSON.parse(resBody) as SegmentCDNSettings
+            settings.integrations["Segment.io"].apiHost = !!env.PREFIX_SECRET ? `segapi.cf.tangia.co/${env.PREFIX_SECRET}/v1` : `segapi.cf.tangia.co/v1`
+            const newBody = JSON.stringify(settings)
+            res = new Response(newBody, {
+              headers: {
+                ...res.headers,
+                "content-length": newBody.length.toString(),
+                "access-control-allow-origin": "*"
+              }
+            })
+            break
+          } catch (error) {
+            logger.warn("error parsing json! Returning as received")
+            res = new Response(resBody, {
+              status: res.status,
+              headers: {
+                ...res.headers,
+                "content-length": resBody.length.toString(),
+                "access-control-allow-origin": "*"
+              }
+            })
+          }
         case env.API_SUBDOMAIN:
           logger.debug("getting the api")
           newURL.hostname = "api.segment.io"
